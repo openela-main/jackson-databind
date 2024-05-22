@@ -1,33 +1,28 @@
 Name:          jackson-databind
-Version:       2.10.0
+Version:       2.14.2
 Release:       1%{?dist}
 Summary:       General data-binding package for Jackson (2.x)
-License:       ASL 2.0 and LGPLv2+
+License:       Apache-2.0 and LGPL-2.0-or-later
 URL:           https://github.com/FasterXML/jackson-databind/
-Source0:       https://github.com/FasterXML/jackson-databind/archive/%{name}-%{version}.tar.gz
+Source0:       %{url}/archive/%{name}-%{version}.tar.gz
 
 BuildRequires:  maven-local
-
-# TODO: Revert back to version macro when versions align again.
 BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-annotations) >= %{version}
 BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-core) >= %{version}
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
 BuildRequires:  mvn(com.google.code.maven-replacer-plugin:replacer)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
-BuildRequires:  mvn(org.powermock:powermock-module-junit4)
+BuildRequires:  mvn(org.mockito:mockito-core)
 
 BuildArch:      noarch
+%if 0%{?fedora}
+ExclusiveArch:  %{java_arches} noarch
+%endif
 
 %description
 The general-purpose data-binding functionality and tree-model for Jackson Data
 Processor. It builds on core streaming parser/generator package, and uses
 Jackson Annotations for configuration.
-
-%package javadoc
-Summary: Javadoc for %{name}
-
-%description javadoc
-This package contains API documentation for %{name}.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
@@ -36,28 +31,30 @@ This package contains API documentation for %{name}.
 %pom_remove_plugin ":maven-enforcer-plugin"
 %pom_remove_plugin "org.jacoco:jacoco-maven-plugin"
 %pom_remove_plugin "org.moditect:moditect-maven-plugin"
+%pom_remove_plugin "de.jjohannes:gradle-module-metadata-maven-plugin"
 
 cp -p src/main/resources/META-INF/NOTICE .
 sed -i 's/\r//' LICENSE NOTICE
 
 # unavailable test deps
 %pom_remove_dep javax.measure:jsr-275
-%pom_remove_dep org.powermock:powermock-api-mockito2
 rm src/test/java/com/fasterxml/jackson/databind/introspect/NoClassDefFoundWorkaroundTest.java
 %pom_xpath_remove pom:classpathDependencyExcludes
 
-# org.powermock.reflect.exceptions.FieldNotFoundException: Field 'fTestClass' was not found in class org.junit.internal.runners.MethodValidator.
+# TestTypeFactoryWithClassLoader fails to compile
+# - it's the only test that uses powermock, so drop the powermock dependencies
+# - mockito is only transitively pulled in by powermock, so add it back
+%pom_remove_dep org.powermock:
+%pom_add_dep org.mockito:mockito-core::test
 rm src/test/java/com/fasterxml/jackson/databind/type/TestTypeFactoryWithClassLoader.java
 
 # Off test that require connection with the web
-rm src/test/java/com/fasterxml/jackson/databind/ser/jdk/JDKTypeSerializationTest.java \
- src/test/java/com/fasterxml/jackson/databind/deser/jdk/JDKStringLikeTypesTest.java \
- src/test/java/com/fasterxml/jackson/databind/TestJDKSerialization.java
+rm src/test/java/com/fasterxml/jackson/databind/TestJDKSerialization.java
 
 %mvn_file : %{name}
 
 %build
-%mvn_build -- -Dmaven.test.failure.ignore=true
+%mvn_build -f -j -- -Dmaven.test.failure.ignore=true
 
 %install
 %mvn_install
@@ -66,10 +63,10 @@ rm src/test/java/com/fasterxml/jackson/databind/ser/jdk/JDKTypeSerializationTest
 %doc README.md release-notes/*
 %license LICENSE NOTICE
 
-%files javadoc -f .mfiles-javadoc
-%license LICENSE NOTICE
-
 %changelog
+* Wed Nov 22 2023 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.14.2-1
+- Rebase to upstream version 2.14.2
+
 * Fri Nov 8 2019 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.10.0-1
 - Update to latest upstream release
 - Fixes: CVE-2019-14540
