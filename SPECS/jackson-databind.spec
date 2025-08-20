@@ -1,5 +1,5 @@
 Name:          jackson-databind
-Version:       2.14.2
+Version:       2.19.1
 Release:       1%{?dist}
 Summary:       General data-binding package for Jackson (2.x)
 License:       Apache-2.0 and LGPL-2.0-or-later
@@ -31,12 +31,18 @@ Jackson Annotations for configuration.
 %pom_remove_plugin ":maven-enforcer-plugin"
 %pom_remove_plugin "org.jacoco:jacoco-maven-plugin"
 %pom_remove_plugin "org.moditect:moditect-maven-plugin"
-%pom_remove_plugin "de.jjohannes:gradle-module-metadata-maven-plugin"
+%pom_remove_plugin "org.codehaus.mojo:animal-sniffer-maven-plugin"
+%pom_remove_plugin "org.gradlex:gradle-module-metadata-maven-plugin"
+
+%pom_xpath_set "//pom:javac.src.version" "1.8"
+%pom_xpath_set "//pom:javac.target.version" "1.8"
+%pom_xpath_inject "//pom:properties" " <maven.compiler.source>1.8</maven.compiler.source>"
+%pom_xpath_inject "//pom:properties" " <maven.compiler.target>1.8</maven.compiler.target>"
 
 cp -p src/main/resources/META-INF/NOTICE .
 sed -i 's/\r//' LICENSE NOTICE
 
-# unavailable test deps
+# unavailable test depsd
 %pom_remove_dep javax.measure:jsr-275
 rm src/test/java/com/fasterxml/jackson/databind/introspect/NoClassDefFoundWorkaroundTest.java
 %pom_xpath_remove pom:classpathDependencyExcludes
@@ -44,12 +50,6 @@ rm src/test/java/com/fasterxml/jackson/databind/introspect/NoClassDefFoundWorkar
 # TestTypeFactoryWithClassLoader fails to compile
 # - it's the only test that uses powermock, so drop the powermock dependencies
 # - mockito is only transitively pulled in by powermock, so add it back
-%pom_remove_dep org.powermock:
-%pom_add_dep org.mockito:mockito-core::test
-rm src/test/java/com/fasterxml/jackson/databind/type/TestTypeFactoryWithClassLoader.java
-
-# Off test that require connection with the web
-rm src/test/java/com/fasterxml/jackson/databind/TestJDKSerialization.java
 
 %mvn_file : %{name}
 
@@ -64,6 +64,10 @@ rm src/test/java/com/fasterxml/jackson/databind/TestJDKSerialization.java
 %license LICENSE NOTICE
 
 %changelog
+* Thu Jul 31 2025 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.19.1-1
+- Rebase to upstream version 2.19.1
+- Resolves: RHEL-103106
+
 * Wed Nov 22 2023 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.14.2-1
 - Rebase to upstream version 2.14.2
 
