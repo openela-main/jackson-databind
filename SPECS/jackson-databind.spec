@@ -1,5 +1,5 @@
 Name:           jackson-databind
-Version:        2.19.1
+Version:        2.21.4
 Release:        1%{?dist}
 Summary:        General data-binding package for Jackson (2.x)
 License:        Apache-2.0 and LGPL-2.0-or-later
@@ -8,7 +8,8 @@ URL:            https://github.com/FasterXML/jackson-databind
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
 
 BuildRequires:  maven-local
-BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-annotations) >= %{version}
+#BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-annotations) >= %{version}
+BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-annotations) >= 2.21
 BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-core) >= %{version}
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-base:pom:) >= %{version}
 BuildRequires:  mvn(com.google.code.maven-replacer-plugin:replacer)
@@ -45,6 +46,7 @@ Jackson Annotations for configuration.
 %pom_remove_plugin "org.moditect:moditect-maven-plugin"
 %pom_remove_plugin "org.codehaus.mojo:animal-sniffer-maven-plugin"
 %pom_remove_plugin "org.gradlex:gradle-module-metadata-maven-plugin"
+%pom_remove_plugin "org.cyclonedx:cyclonedx-maven-plugin"
 
 %pom_xpath_set "//pom:javac.src.version" "1.8"
 %pom_xpath_set "//pom:javac.target.version" "1.8"
@@ -76,6 +78,10 @@ rm src/test/java/com/fasterxml/jackson/databind/introspect/NoClassDefFoundWorkar
 %license LICENSE NOTICE
 
 %changelog
+* Mon Jul 06 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1
+- Update to version 2.21.4
+- Resolves: RHEL-188300
+
 * Wed Jul 16 2025 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.19.1-1
 - Update to version 2.19.1
 - Resolves: RHEL-100233
