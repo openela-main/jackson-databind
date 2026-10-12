@@ -1,5 +1,5 @@
 Name:           jackson-databind
-Version:        2.21.4
+Version:        2.21.6
 Release:        1%{?dist}
 Summary:        General data-binding package for Jackson (2.x)
 License:        Apache-2.0 and LGPL-2.0-or-later
@@ -78,6 +78,10 @@ rm src/test/java/com/fasterxml/jackson/databind/introspect/NoClassDefFoundWorkar
 %license LICENSE NOTICE
 
 %changelog
+* Mon Oct 05 2026 IDM PKI Team <ipa-pki-team@redhat.com> - 2.21.6-1
+- Rebase to version 2.21.6
+- Resolves: RHEL-259227
+
 * Mon Jul 06 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1
 - Update to version 2.21.4
 - Resolves: RHEL-188300
