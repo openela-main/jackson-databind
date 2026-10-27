@@ -1,10 +1,11 @@
 Name:          jackson-databind
 Version:       2.21.4
-Release:       1%{?dist}
+Release:       1%{?dist}.1
 Summary:       General data-binding package for Jackson (2.x)
 License:       Apache-2.0 and LGPL-2.0-or-later
 URL:           https://github.com/FasterXML/jackson-databind/
 Source0:       %{url}/archive/%{name}-%{version}.tar.gz
+Patch1:        0001-Fix-CVE-2026-91777Avoid-quadratic-forward-reference.patch
 
 BuildRequires:  maven-local
 #BuildRequires:  mvn(com.fasterxml.jackson.core:jackson-annotations) >= %{version}
@@ -27,6 +28,7 @@ Jackson Annotations for configuration.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
+%patch -P1 -p1
 
 # Remove plugins unnecessary for RPM builds
 %pom_remove_plugin ":maven-enforcer-plugin"
@@ -66,6 +68,10 @@ rm src/test/java/com/fasterxml/jackson/databind/introspect/NoClassDefFoundWorkar
 %license LICENSE NOTICE
 
 %changelog
+* Tue Oct 20 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1.1
+- Fix CVE-2026-91777
+- Resolves: RHEL-284554
+
 * Wed Jul 08 2026 Red Hat PKI Team <rhcs-maint@redhat.com> - 2.21.4-1
 - Rebase to upstream version 2.21.4
 - Resolves: RHEL-188291
